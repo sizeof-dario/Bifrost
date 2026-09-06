@@ -1,0 +1,28 @@
+body {
+        font-family: monospace;
+        background-color: #121212;
+        color: #FFFFFF;
+}
+
+a {
+        text-decoration: none;
+        color: #2962FF;
+}
+
+ul {
+        list-style-type: none;
+}
+
+div.nav-bar {
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:10px;
+    padding-bottom:10px;
+    background-color: #263238;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#link_list {
+        font-size: 20px;
+}
