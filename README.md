@@ -15,17 +15,14 @@ Bifrost is an operating system built for learning purposes. It doesn't aim to be
 Bifrost is based on a **monolithic kernel**, boots on **legacy BIOS** and targets the **x86_64 architecture**.
 
 ## How do I get Bifrost?
-To get Bifrost, you first need to resolve some dependencies. To be precise, you'll need a cross-compiler **i686-elf-gcc**, a cross-linker **i686-elf-ld**, and **make**.
-
-> [!Note]
-> Also, I still haven't tried Bifrost outside of an emulated environment, and neither should you, so you will also need a system emulator **qemu-system-i386**.
-
-Once all dependencies are resolved, you can clone the repository and build the OS by running
+To get Bifrost, clone the repository and run
 ```
 make
 ```
 in the project folder.
-> Or, if you're using QEMU, you can directly run it with
+
+> [!Note]
+> I still haven't tried Bifrost outside of an emulated environment, and neither should you, so you will need a system emulator. If you get **qemu-system-i386**, you can also try Bifrost by running
 > ```
 > make run
 > ```
