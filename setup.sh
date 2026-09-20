@@ -45,15 +45,15 @@ spin()
         local i=0
         while kill -0 "$PID" 2>/dev/null; do
                 i=$(( (i+1) %${#SPIN} ))
-                printf "\r[${SPIN:$i:1}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT}\e[K" "${ACTION}" "${OBJECT}"
+                printf "\r[${SPIN:$i:1}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K" "${ACTION}" "${OBJECT}"
                 sleep 0.5
         done
 
         if wait "$PID"; then
-                printf "\r[${ANSI_GREEN}${CHECK}${ANSI_DEFAULT}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT}\e[K\n" "${ACTION}" "${OBJECT}"
+                printf "\r[${ANSI_GREEN}${CHECK}${ANSI_DEFAULT}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\n" "${ACTION}" "${OBJECT}"
                 return 0
         else
-                printf "\r[${ANSI_RED}${CROSS}${ANSI_DEFAULT}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT}\e[K\n" "${ACTION}" "${OBJECT}"
+                printf "\r[${ANSI_RED}${CROSS}${ANSI_DEFAULT}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\n" "${ACTION}" "${OBJECT}"
                 return 1
         fi
 }
@@ -68,12 +68,12 @@ if [[ ! -x "${PREFIX}/bin/${TARGET}-ld" || ! ("$CURRENT_BINUTILS_VERSION" == *"$
         echo -e "${ANSI_BOLD}binutils (version ${BINUTILS_VERSION})${ANSI_DEFAULT} not found."
 
         if [ ! -f "${TAR_DIR}/binutils-${BINUTILS_VERSION}.tar.xz" ]; then
-                wget -P "$TAR_DIR" "$BINUTILS_URL" > /dev/null & spin $! "Download" "binutils-${BINUTILS_VERSION}.tar.xz"
+                wget -nv -P "$TAR_DIR" "$BINUTILS_URL" >> "${LOG_DIR}/${LOG_FILE}" 2>&1 & spin $! "Download" "binutils-${BINUTILS_VERSION}.tar.xz"
         fi
 
         if [ ! -d "${SRC_DIR}/binutils-${BINUTILS_VERSION}" ]
         then
-                tar -xf "${TAR_DIR}/binutils-${BINUTILS_VERSION}.tar.xz" -C "$SRC_DIR" & spin $! "Extract" "binutils-${BINUTILS_VERSION}"
+                tar -xf "${TAR_DIR}/binutils-${BINUTILS_VERSION}.tar.xz" -C "$SRC_DIR" >> "${LOG_DIR}/${LOG_FILE}" 2>&1 & spin $! "Extract" "binutils-${BINUTILS_VERSION}"
         fi
 
         (
@@ -92,11 +92,11 @@ if [[ ! -x "${PREFIX}/bin/${TARGET}-gcc" || ! ("$CURRENT_GCC_VERSION" == *"$GCC_
         echo -e "${ANSI_BOLD}${TARGET}-gcc (version ${GCC_VERSION})${ANSI_DEFAULT} not found."
 
         if [ ! -f "${TAR_DIR}/gcc-${GCC_VERSION}.tar.xz" ]; then
-                wget -P "$TAR_DIR" "$GCC_URL" > /dev/null & spin $! "Download" "gcc-${GCC_VERSION}.tar.xz"
+                wget -nv -P "$TAR_DIR" "$GCC_URL" >> "${LOG_DIR}/${LOG_FILE}" 2>&1 & spin $! "Download" "gcc-${GCC_VERSION}.tar.xz"
         fi
 
         if [ ! -d "${SRC_DIR}/gcc-${GCC_VERSION}" ]; then
-                tar -xf "${TAR_DIR}/gcc-${GCC_VERSION}.tar.xz" -C "$SRC_DIR" & spin $! "Extract" "gcc-${GCC_VERSION}"
+                tar -xf "${TAR_DIR}/gcc-${GCC_VERSION}.tar.xz" -C "$SRC_DIR" >> "${LOG_DIR}/${LOG_FILE}" 2>&1 & spin $! "Extract" "gcc-${GCC_VERSION}"
         fi
 
         export PATH="${PREFIX}/bin:$PATH"
