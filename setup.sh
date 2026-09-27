@@ -106,7 +106,7 @@ ${ANSI_DEFAULT} not found."
 
         (
         cd "$BINUTILS_BUILD_DIR" && \
-        "${SRC_DIR}/binutils-${BINUTILS_VERSION}/configure" \
+        sh "${SRC_DIR}/binutils-${BINUTILS_VERSION}/configure" \
         --target="$TARGET" \
         --prefix="$PREFIX" \
         --disable-nls \
@@ -138,8 +138,10 @@ ${ANSI_DEFAULT} not found."
         export PATH="${PREFIX}/bin:$PATH"
 
         (
+                cd "${SRC_DIR}/gcc-${GCC_VERSION}" && \
+                sh "./contrib/download_prerequisites" && \
                 cd "$GCC_BUILD_DIR" && \
-                "${SRC_DIR}/gcc-${GCC_VERSION}/configure" \
+                sh "${SRC_DIR}/gcc-${GCC_VERSION}/configure" \
                 --target="$TARGET" \
                 --prefix="$PREFIX" \
                 --disable-nls \
