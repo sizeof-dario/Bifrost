@@ -20,7 +20,7 @@ TARGET="i686-elf"
 PREFIX="${HOME}/opt/cross"
 
 # Various directories
-WORK_DIR="$(pwd)/.bifrost-toolchain-build"
+WORK_DIR="$(pwd)/.bifrost_toolchain_build"
 TAR_DIR="${WORK_DIR}/tar"
 SRC_DIR="${WORK_DIR}/src"
 BINUTILS_BUILD_DIR="${WORK_DIR}/build-binutils-${BINUTILS_VERSION}"
@@ -28,7 +28,7 @@ GCC_BUILD_DIR="${WORK_DIR}/build-gcc-${GCC_VERSION}"
 LOG_DIR="$(pwd)"
 
 # Log file name
-LOG_FILE="bifrost-toolchain-build.log"
+LOG_FILE="bifrost_toolchain_build.log"
 
 # Possibly retrieve cross-toolchain tools versions if they are present
 CURRENT_BINUTILS_VERSION=$("${PREFIX}/bin/${TARGET}-ld" \
@@ -84,6 +84,9 @@ echo -e "vvv Bifrost Toolchain Build - $(date) vvv\n" \
 
 # Hide terminal cursor for better output
 printf "\e[?25l"
+
+# Check dependencies
+bash check_dependencies.sh
 
 # Download, extract and build binutils for i686-elf if necessary
 if [[ ! -x "${PREFIX}/bin/${TARGET}-ld" \

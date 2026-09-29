@@ -55,8 +55,7 @@ dkms.conf
 *.dwo
 
 # build
-build/
-toolchain-build/
+*build/
 
 # local settings
 .vscode/

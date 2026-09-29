@@ -15,7 +15,7 @@ Bifrost will be based on a **monolithic kernel**, boots on **legacy BIOS** and c
 ## How do I get Bifrost?
 To get Bifrost, clone the repo and run `make` in the project folder. That will take care of possibly building the cross-toolchain that builds the OS and of building the OS itself. 
 
-Note, however, that some of the dependencies might still need to be resolved by hand if the necessary tools are not already installed, because they depend on your distro or require root privileges, which I chose not to ask for on *your* machine. If so, the build will inevitably fail. When that happens, you can check the auto-generated `toolchain-build.log` file if a failure happens during the cross-toolchain build or the terminal output if a failure happens at OS build time.
+Note, however, that some of the dependencies might still need to be resolved by hand if the necessary tools are not already installed, because they depend on your distro or require root privileges, which I chose not to ask for on *your* machine. If so, the build will inevitably fail. When that happens, you can check the auto-generated `bifrost_toolchain_build.log` file if a failure happens during the cross-toolchain build or the terminal output if a failure happens at OS build time.
 
 Anyway, if you want to check beforehand, here's a table of the dependencies I had to resolve on an empty Podman container with Fedora 44:
 
@@ -25,9 +25,6 @@ GNU Wget2                     | `wget`       | -                  | 2.2.1
 gcc (GCC)                     | `gcc`        | -                  | 16.2.1
 GNU texinfo                   | `makeinfo`   | -                  | 7.2
 g++ (GCC)                     | `g++`        | Support for C++14  | 16.2.1
-GMP with development headers  | -            | Version 4.2+       | 6.3.0
-MPFR with development headers | -            | Version 3.1.0+     | 4.2.2
-MPC with development headers  | -            | Version 0.8.0+     | 1.4.1
 GNU diffutils                 | `cmp`        | -                  | 3.12
 NASM                          | `nasm`       | -                  | 3.02
 GNU Make                      | `make`       | -                  | 4.4.1

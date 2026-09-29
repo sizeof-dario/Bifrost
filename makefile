@@ -1,4 +1,4 @@
-.PHONY: run clean disasm
+.PHONY: run clean disasm check_dependencies
 
 CC = $(HOME)/opt/cross/bin/i686-elf-gcc
 LD = $(HOME)/opt/cross/bin/i686-elf-ld
@@ -14,14 +14,12 @@ build/int.o: EXTRA_FLAGS = -mgeneral-regs-only
 
 
 
--include $(DEPENDENCIES)
-
-
-
 build/kernel.bin: $(OBJECTS) link.ld | $(LD) build
 	$(LD) -T link.ld $(OBJECTS) -o $@ -Map=build/kernel.map && $(MAKE)
 
-build/boot.o: src/boot.asm | build
+
+
+build/boot.o: src/boot.asm | check_dependencies build
 	$(AS) -f elf32 $< -o $@
 
 build/%.o:src/%.c | $(CC) build
@@ -31,6 +29,13 @@ build/%.o:src/%.c | $(CC) build
 
 $(CC) $(LD) $(DA) &:
 	bash setup.sh
+	
+check_dependencies:
+	@bash check_dependencies.sh
+
+
+
+-include $(DEPENDENCIES)
 
 
 
