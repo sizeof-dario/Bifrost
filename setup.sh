@@ -86,7 +86,7 @@ echo -e "vvv Bifrost Toolchain Build - $(date) vvv\n" \
 printf "\e[?25l"
 
 # Check dependencies
-DEPENDENCIES=(bzip2 cmp gcc g++ makeinfo nasm tar wget xz)
+DEPENDENCIES=(bzip2 cmp gcc g++ makeinfo tar wget xz)
 missing=0
 list=()
 for tool in "${DEPENDENCIES[@]}"; do
