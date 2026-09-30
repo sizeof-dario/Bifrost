@@ -86,7 +86,22 @@ echo -e "vvv Bifrost Toolchain Build - $(date) vvv\n" \
 printf "\e[?25l"
 
 # Check dependencies
-bash check_dependencies.sh
+DEPENDENCIES=(bzip2 cmp gcc g++ makeinfo nasm tar wget xz)
+missing=0
+list=()
+for tool in "${DEPENDENCIES[@]}"; do
+        if ! command -v "$tool" >/dev/null 2>&1; then
+                list+=("$tool")
+                missing=1  
+        fi
+done
+
+if ((missing)); then
+        echo -e \
+"${ANSI_RED}You need to resolve the following dependencies:${ANSI_DEFAULT}"
+        echo -e "\t${ANSI_BOLD}${list[@]}${ANSI_DEFAULT}"
+        exit 1        
+fi
 
 # Download, extract and build binutils for i686-elf if necessary
 if [[ ! -x "${PREFIX}/bin/${TARGET}-ld" \

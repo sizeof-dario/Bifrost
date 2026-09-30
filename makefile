@@ -1,8 +1,8 @@
-.PHONY: run clean disasm check_dependencies
+.PHONY: run clean disasm
 
 CC = $(HOME)/opt/cross/bin/i686-elf-gcc
 LD = $(HOME)/opt/cross/bin/i686-elf-ld
-AS = nasm
+AS = $(HOME)/opt/cross/bin/i686-elf-as
 DA = $(HOME)/opt/cross/bin/i686-elf-objdump
 QM = qemu-system-i386
 
@@ -19,20 +19,17 @@ build/kernel.bin: $(OBJECTS) link.ld | $(LD) build
 
 
 
-build/boot.o: src/boot.asm | check_dependencies build
-	$(AS) -f elf32 $< -o $@
+build/boot.o: src/boot.asm | $(AS) build
+	$(AS) $< -o $@
 
 build/%.o:src/%.c | $(CC) build
 	$(CC) -ffreestanding -O0 -Iinclude $(EXTRA_FLAGS) -MD -c $< -o $@
 
 
 
-$(CC) $(LD) $(DA) &:
+$(CC) $(LD) $(AS) $(DA) &:
 	bash setup.sh
 	
-check_dependencies:
-	@bash check_dependencies.sh
-
 
 
 -include $(DEPENDENCIES)
