@@ -37,7 +37,7 @@ I deduced the dependencies list via testing the build in Podman containers. The 
 <div align="center">
   
 Dependency | Fedora 44     | Debian 13.7/Ubuntu 26.04.1 | Arch Linux
------------|---            |---                         |---             
+:----------|:---            |:---                         |:---             
 bzip2      | ✕             | ✓: `bzip2`                 | ✕                
 cmp        | ✓: `cmp`      | ✕                          | ✓: `diffutils`   
 gcc        | ✓: `gcc`      | ✓: `gcc`                   | ✓: `gcc`        
