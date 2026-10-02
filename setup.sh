@@ -64,17 +64,17 @@ spin()
         local i=0
         while kill -0 "$PID" 2>/dev/null; do
                 i=$(( (i+1) %${#SPIN} ))
-                printf "\r[${SPIN:$i:1}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT}\e[K\e[$(($COLUMNS-5))G%02d:%02d" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
+                printf "\r[${SPIN:$i:1}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT}\e[K\e[$(($COLUMNS-5))G%02dm%02ds" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
                 sleep 0.5
         done
 
         if wait "$PID"; then
                 printf "\r[${ANSI_GREEN}${CHECK}${ANSI_DEFAULT}] %s \
-${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\e[$(($COLUMNS-5))G%02d:%02d\n" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
+${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\e[$(($COLUMNS-5))G%02dm%02ds\n" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
                 return 0
         else
                 printf "\r[${ANSI_RED}${CROSS}${ANSI_DEFAULT}] %s \
-${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\e[$(($COLUMNS-5))G%02d:%02d\n" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
+${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\e[$(($COLUMNS-5))G%02dm%02ds\n" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
                 return 1
         fi
 }
