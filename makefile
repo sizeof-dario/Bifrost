@@ -15,8 +15,7 @@ build/int.o: EXTRA_FLAGS = -mgeneral-regs-only
 
 
 build/kernel.bin: $(OBJECTS) link.ld | $(LD) build
-	$(LD) -T link.ld $(OBJECTS) -o $@ -Map=build/kernel.map && $(MAKE)
-
+	$(LD) -T link.ld $(OBJECTS) -o $@ -Map=build/kernel.map
 
 
 build/boot.o: src/boot.asm | $(AS) build

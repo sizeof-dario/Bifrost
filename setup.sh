@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+trap 'trap "" SIGTERM && kill -15 0 && exit 130' SIGINT
 trap 'printf "\e[?25h"; \
         echo -e "\n^^^ Bifrost Toolchain Build - $(date) ^^^\n\n\n" \
         >> "${LOG_DIR}/${LOG_FILE}"' EXIT
@@ -45,6 +46,9 @@ SPIN="-\\|/"
 CHECK="✓"
 CROSS="✕"
 
+# Number of columns of the terminal window
+# COLUMNS="$(tput cols)"
+
 # spin() displays a spinner while some process is sent in background
 # Arguments:
 #       PID of the process to wait for
@@ -52,6 +56,7 @@ CROSS="✕"
 #       on what OBJECT the action is being performed on
 spin()
 {
+        SECONDS=0
         local PID="$1"
         local ACTION="$2"
         local OBJECT="$3"
@@ -59,18 +64,17 @@ spin()
         local i=0
         while kill -0 "$PID" 2>/dev/null; do
                 i=$(( (i+1) %${#SPIN} ))
-                printf "\r[${SPIN:$i:1}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT} \
-\e[K" "${ACTION}" "${OBJECT}"
+                printf "\r[${SPIN:$i:1}] %s ${ANSI_BOLD}%s${ANSI_DEFAULT}\e[K\e[$(($COLUMNS-5))G%02d:%02d" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
                 sleep 0.5
         done
 
         if wait "$PID"; then
                 printf "\r[${ANSI_GREEN}${CHECK}${ANSI_DEFAULT}] %s \
-${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\n" "${ACTION}" "${OBJECT}"
+${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\e[$(($COLUMNS-5))G%02d:%02d\n" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
                 return 0
         else
                 printf "\r[${ANSI_RED}${CROSS}${ANSI_DEFAULT}] %s \
-${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\n" "${ACTION}" "${OBJECT}"
+${ANSI_BOLD}%s${ANSI_DEFAULT} \e[K\e[$(($COLUMNS-5))G%02d:%02d\n" "${ACTION}" "${OBJECT}" "$(($SECONDS / 60))" "$((SECONDS % 60))"
                 return 1
         fi
 }

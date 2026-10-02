@@ -19,14 +19,17 @@ Having gotten them, clone the repository and run `make` in the project folder.
 
 Running `make` will build the OS and possibly the needed cross-toolchain too.
 
+> [!WARNING]
+> Any mid-build interruption will either leave some files corrupted or cause make to delete its targets. Because of this, if any interruption happens, check whether `~/opt/cross` is present and, if so, delete it before running `make` again.
+
 Should the build fail, you can check the auto-generated `bifrost_toolchain_build.log` file if a failure happens during the cross-toolchain build or the terminal output if a failure happens at OS build time.
 
 > [!IMPORTANT] 
 > Some dependencies might still need to be resolved by hand because they depend on your linux distribution or require root privileges, which I chose not to ask for. If so, the terminal will display a message listing what you need to install as soon as you run `make`. If you're using Fedora 44 the list works fine as it is with `dnf`; if you have some other distro, continue reading.
 
-I deduced the dependencies list via testing the build in Podman containers. The table below lists which dependencies I found needed to be installed for wich distribution among the distros I tested, along with the package name needed for their package manager. If you have a distribution I didn't test, the build should still work fine, there may just be some other dependencies (that either the terminal or the `.log` file should tell you) or some paackages might have a different name.
+I deduced the dependencies list via testing the build in Podman containers. The table below lists which dependencies I found needed to be installed for which distribution among the distros I tested, along with the package name needed for their package manager. If you have a distribution I didn't test, the build should still work fine, there may just be some other dependencies (that either the terminal or the `.log` file should tell you) or some packages might have a different name.
 
-Dependency | Fedora 44     | Debain 13.7/Ubuntu 26.04.1 | Arch Linux
+Dependency | Fedora 44     | Debian 13.7/Ubuntu 26.04.1 | Arch Linux
 -----------|---            |---                         |---             
 bzip2      | ✕             | ✓, `bzip2`                 | ✕                
 cmp        | ✓, `cmp`      | ✕                          | ✓, `diffutils`   
