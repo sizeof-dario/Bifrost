@@ -1,16 +1,17 @@
-.PHONY: run clean disasm
+.PHONY: clean run
 
-CC = $(HOME)/opt/cross/bin/i686-elf-gcc
-LD = $(HOME)/opt/cross/bin/i686-elf-ld
-AS = $(HOME)/opt/cross/bin/i686-elf-as
-DA = $(HOME)/opt/cross/bin/i686-elf-objdump
+CC = ~/opt/cross/bin/i686-elf-gcc
+LD = ~/opt/cross/bin/i686-elf-ld
+AS = ~/opt/cross/bin/i686-elf-as
+
 QM = qemu-system-i386
 
 C_SOURCES = $(wildcard src/*.c)
 OBJECTS = build/boot.o $(patsubst src/%.c,build/%.o,$(C_SOURCES))
 DEPENDENCIES = $(wildcard build/*.d)
 
-build/int.o: EXTRA_FLAGS = -mgeneral-regs-only
+C_FLAGS = -ffreestanding -O0 -Iinclude
+build/int.o: EXTRA_C_FLAGS = -mgeneral-regs-only
 
 
 
@@ -22,7 +23,7 @@ build/boot.o: src/boot.asm | $(AS) build
 	$(AS) $< -o $@
 
 build/%.o:src/%.c | $(CC) build
-	$(CC) -ffreestanding -O0 -Iinclude $(EXTRA_FLAGS) -MD -c $< -o $@
+	$(CC) $(C_FLAGS) $(EXTRA_C_FLAGS) -MD -c $< -o $@
 
 
 
@@ -40,11 +41,6 @@ run: build/kernel.bin
 
 clean:
 	rm -f $(OBJECTS) $(DEPENDENCIES) build/kernel.map
-
-disasm: build/kernel.bin | $(DA)
-	$(DA) -D -b binary -m i386 $<
-
-
 
 build:
 	mkdir -p build
