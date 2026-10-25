@@ -19,7 +19,7 @@ build/kernel.bin: $(OBJECTS) link.ld | $(LD) build
 	$(LD) -T link.ld $(OBJECTS) -o $@ -Map=build/kernel.map
 
 
-build/boot.o: src/boot.asm | $(AS) build
+build/boot.o: src/boot.S | $(AS) build
 	$(AS) $< -o $@
 
 build/%.o:src/%.c | $(CC) build
