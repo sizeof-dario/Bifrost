@@ -1,6 +1,6 @@
 /*  BIFROST BOOTLOADER *********************************************************
     
-        Version:            0.1.0
+        Version:            0.1.1
 
         Project repository: https://github.com/sizeof-dario/Bifrost.git
 
@@ -51,7 +51,9 @@ start:
     call        A20_test
     je          A20_enabled
 
-    # CONTINUE
+temp_hlt:
+    hlt
+    jmp temp_hlt
 
 A20_enabled:
 /*  ^^^ HANDLE A20 LINE ^^^ ***************************************************/
