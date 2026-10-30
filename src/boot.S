@@ -1,6 +1,6 @@
 /*  BIFROST BOOTLOADER *********************************************************
     
-        Version:            0.1.1
+        Version:            0.2.0
 
         Project repository: https://github.com/sizeof-dario/Bifrost.git
 
@@ -23,50 +23,50 @@
 /*  vvv SET NECESSARY CPU REGISTERS vvv ***************************************/
 
     /*  Set cs:ip pair to a known values pair.                                */
-    jmp         $0x0000,        $start
+    jmp             $0x0000,        $start
 start:
 
     /*  Set stack.                                                            */
-    xor         %ax,            %ax
-    mov         %ax,            %ss
-    mov         $0x7C00,        %sp
+    xor             %ax,            %ax
+    mov             %ax,            %ss
+    mov             $0x7C00,        %sp
 
 /*  ^^^ SET NECESSARY CPU REGISTERS ^^^ ***************************************/
-
-/*  CURRENT MAIN REGISTERS STATE
-    ax      bx      cx      dx      cs      ds      es      ss
-    0x0000  0x????  0x????  0x????  0x0000  0x????  0x????  0x0000            */
 
 
 
 /*  vvv ENABLE A20 LINE vvv ***************************************************/
 
     /*  Check if A20 line is already enabled. If so, do nothing.              */
-    call        A20_test
-    je          A20_enabled
+    call            A20_test
+    jz              A20_enabled
 
     /*  Attempt to enable A20 line with BIOS function.                        */
-    mov         $0x2401,        %ax
-    int         $0x15
-    call        A20_test
-    je          A20_enabled
+    mov             $0x2401,        %ax
+    int             $0x15
+    call            A20_test
+    jz              A20_enabled
 
-temp_hlt:
+    /*  Attempt to enable A20 line with keyboard controller.                  */
+    call            A20_kbc
+    call            A20_test_timeout
+    jz              A20_enabled
+
+    /*  Attempt to enable A20 line with fast A20 method.                      */
+temp_loop:
     hlt
-    jmp temp_hlt
+    jmp             temp_loop
 
 A20_enabled:
 /*  ^^^ HANDLE A20 LINE ^^^ ***************************************************/
 
+
+
+
+
 /*  CURRENT MAIN REGISTERS STATE
     ax      bx      cx      dx      cs      ds      es      ss
     0x????  0x????  0x????  0x????  0x????  0x????  0x????  0x????            */
-
-
-
-
-
-
 
     xor     %ax,        %ax
     mov     %ax,        %es
@@ -126,32 +126,157 @@ safe_hlt_protected:
     jmp safe_hlt_protected
 
 
-/*  vvv A20_test SUBROUTINE vvv ***********************************************/
+
+
+
+
+
+
+/*  vvv A20 LINE SUBROUTINES vvv **********************************************/
 
 /*  Test if A20 line is enabled. If so, ZF is set to 1, otherwise it is set to
     0. The subroutine doesn't preserve flags and pollutes memory outside the
     MBR, so it should only be called before loading the kernel.               */
 A20_test:
-    push        %ax
-    push        %bx
-    push        %ds
-    push        %es
-    xor         %ax,            %ax
-    mov         %ax,            %ds
-    mov         $0xFFFF,        %ax
-    mov         %ax,            %es
-    mov         0x7E00,         %ax
-    mov         %ax,            %bx
-    inc         %bx
-    mov         %bx,            %es:0x7E10
-    cmpw        0x7E00,         %ax        
-    pop         %es
-    pop         %ds
-    pop         %bx
-    pop         %ax
+    push            %ax
+    push            %bx
+    push            %ds
+    push            %es
+
+    xor             %ax,            %ax
+    mov             %ax,            %ds
+    mov             $0xFFFF,        %ax
+    mov             %ax,            %es
+    mov             0x7E00,         %ax
+    mov             %ax,            %bx
+    inc             %bx
+    mov             %bx,            %es:0x7E10
+    cmpw            0x7E00,         %ax      
+
+    pop             %es
+    pop             %ds
+    pop             %bx
+    pop             %ax
     ret
 
-/*  ^^^ A20_test SUBROUTINE ^^^ ***********************************************/
+A20_test_timeout:
+    push            %cx
+    mov             $0xFFFF,        %cx
+0:
+    call            A20_test
+    jz              1f
+    dec             %cx
+    jnz             0b
+    or              $0x01,          %cl
+1:
+    pop             %cx
+    ret
+
+/*  Attempt to enable A20 line with keyboard controller.                      
+    Data port: 0x60
+    Status/Command port: 0x64
+    This routine currently does NOT:
+        - Check if the controller is present;
+        - Empty the data buffer in advance;   
+        - Handle permanently disabled keyboard.                               */
+A20_kbc:
+    push            %ax
+    push            %bx
+    push            %cx
+    pushf
+
+    /*  Disable Interrupts.                                                   */
+    cli
+
+    /*  Disable keyboard.                                                     */
+    call            A20_wait_status_can_write
+    test            %cx,            %cx
+    jz              1f
+    mov             $0xAD,          %al
+    outb            %al,            $0x64
+
+    /*  Read current status from data port.                                   */
+    call            A20_wait_status_can_write
+    test            %cx,            %cx
+    jz              0f
+    mov             $0xD0,          %al
+    outb            %al,            $0x64
+    call            A20_wait_status_can_read
+    test            %cx,            %cx
+    jz              0f
+    inb             $0x60,          %al
+
+    /*  Enable A20 line.                                                      */
+    or              $0b00000010,    %al
+    mov             %al,            %bl
+
+    /*  Update status.                                                        */
+    call            A20_wait_status_can_write
+    test            %cx,            %cx
+    jz              0f
+    mov             $0xD1,          %al
+    outb            %al,            $0x64
+    call            A20_wait_status_can_write
+    test            %cx,            %cx
+    jz              0f
+    mov             %bl,            %al
+    outb            %al,            $0x60
+0:
+
+    /*  Enable keyboard.                                                      */
+    call            A20_wait_status_can_write
+    test            %cx,            %cx
+    jz              1f
+    mov             $0xAE,          %al
+    outb            %al,            $0x64
+1:
+
+    /*  Make sure last command took effect.                                   */
+    call            A20_wait_status_can_write
+
+    popf
+    pop             %cx
+    pop             %bx
+    pop             %ax
+    ret
+
+/*  Wait for command port to be ready for write operation.
+    The subroutine reads status register until bit 1 is 0 to know if writing to
+    kbc ports is possible; it uses the cx register to signal possible timeout
+    failure with a 0 value.                                                   */
+A20_wait_status_can_write:
+    push            %ax
+    mov             $0xFFFF,        %cx    
+0:
+    outb            %al,            $0x80          /* al value is irrelevant. */
+    inb             $0x64,          %al
+    and             $0b00000010,    %al
+    jz              1f
+    dec             %cx
+    jnz             0b
+1:
+    pop             %ax
+    ret
+
+/*  Wait for command port to be ready for read operation.
+    The subroutine reads status register until bit 0 is 1 to know if reading
+    from kbc ports is possible; it uses the cx register to signal possible
+    timeout failure with a 0 value.                                           */
+A20_wait_status_can_read:
+    push            %ax
+    mov             $0xFFFF,        %cx    
+0:
+    outb            %al,            $0x80          /* al value is irrelevant. */
+    inb             $0x64,          %al
+    and             $0b00000001,    %al
+    jnz             1f
+    dec             %cx
+    jnz             0b
+1:
+    pop             %ax
+    ret
+
+/*  ^^^ A20 LINE SUBROUTINES ^^^ **********************************************/
 
 
 
