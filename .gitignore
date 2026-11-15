@@ -55,13 +55,14 @@ dkms.conf
 *.dwo
 
 # build
-*build/
-
-# local settings
-.vscode/
+build/
 
 # log files
 *.log
 
 # notes
 notes
+
+# other stuff
+*.png
+old_*

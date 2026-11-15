@@ -8,7 +8,6 @@ SECTIONS
     {
         build/boot.o(.text)
         *(.text)
-
     }
 
     .data :
@@ -26,8 +25,7 @@ SECTIONS
         *(.bss)
     }
 
-    /* 10 sectors in total */
-    . = 0x9000 - 1;
+    . = 0xFFFE;
     .padding :
     {
         BYTE(0x00)
