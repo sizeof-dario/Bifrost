@@ -4,28 +4,34 @@ SECTIONS
 {
     . = 0x7C00;
 
-    .text : {
+    .text : {    
         build/boot.o(.text)
-        boot2_start = .;
-        *(.text)
     }
 
-    .data : { *(.data) }
+    .data : { 
+        __BOOT2_START = .;
+        *(.data)
+    }
+
     .rodata : { *(.rodata) }
 
-    . = ALIGN(0x200);
-    boot2_end = .;
+    .text2 : {
+        *(.text)
+        . = ALIGN(0x200);
+        __BOOT2_END = .;
+    }
 
-    . = ALIGN(0x10);
-    bss_start = .;
-
-    .bss : { *(.bss) }
+    # . = ALIGN(0x10);
+    .bss : {
+        __BSS_START = .;
+        *(.bss) 
+        . = ALIGN(0x10);
+        __BSS_END = .;
+    }
     
-    . = ALIGN(0x10);
-    bss_end = .;
+    /DISCARD/ : {
+        *(.comment)
+	}
 
-    . = ALIGN(0x200) - 1;
-    .padding : { BYTE(0x00) }
-
-    . = ASSERT(. <= 0xFFFF, "Bootloader too big!");
+    ASSERT(. <= 0xFFFF, "Bootloader too big!")
 }

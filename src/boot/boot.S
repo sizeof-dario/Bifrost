@@ -11,8 +11,6 @@
         about 30KB of space both below and above it.
 */
 
-.extern boot2main
-
 .code16
         # Set up registers
         ljmp    $0x0000, $start
@@ -24,8 +22,8 @@ start:  xorw    %ax, %ax
         cld
 
         # Update blkcnt
-        movw    $boot2_end, %ax
-        subw    $boot2_start, %ax
+        movw    $__BOOT2_END, %ax
+        subw    $__BOOT2_START, %ax
         shrw    $0x09, %ax
         movw    %ax, blkcnt
 
@@ -41,8 +39,8 @@ start:  xorw    %ax, %ax
         jmp     die
 
         # Zero the bss
-z_bss:  movw    $bss_start, %di
-        movw    $bss_end, %cx
+z_bss:  movw    $__BSS_START, %di
+        movw    $__BSS_END, %cx
         xorl    %eax, %eax
         subw    %di, %cx
         shrw    $0x02, %cx
